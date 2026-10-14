@@ -1,0 +1,60 @@
+# ==============================================================================
+# .dockerignore —— 构建上下文瘦身 + 防密钥泄漏
+# 原则：把 .env、虚拟环境、node_modules、缓存与调研原始数据全部挡在上下文之外，
+#       但【必须保留】data/seed（replay 模式的离线快照数据源）。
+# ==============================================================================
+
+# ---- 密钥与本地配置（绝不进镜像）----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- 版本控制与 CI ----
+.git
+.gitignore
+.github
+
+# ---- 文档与文档资产（镜像里不需要）----
+docs
+*.md
+!README.md
+
+# ---- Python ----
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/venv/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/*.egg-info/
+
+# ---- Node / 前端 ----
+**/node_modules/
+**/dist/
+# 注意：不要把 frontend/ 整体排除 —— Dockerfile 的 frontend-build 阶段需要
+# frontend/package.json 与锁文件；整目录排除会导致该阶段无输入。
+!frontend/package.json
+**/.vite/
+**/coverage/
+
+# ---- 数据：保留 seed，排除缓存与调研原始数据 ----
+data/cache/
+data/raw/
+**/*.db
+**/*.db-journal
+**/*.sqlite3
+
+# ---- 编辑器与系统 ----
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---- 本地临时产物 ----
+*.log
+logs/
+tmp/

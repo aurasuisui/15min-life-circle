@@ -1,0 +1,73 @@
+# ==============================================================================
+# .gitignore —— 「15 分钟生活圈」智能体检与规划助手
+# ==============================================================================
+
+# ---- 密钥与环境变量：【绝不提交】----
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+!*.env.example
+
+# ---- 编辑器与 IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- 操作系统 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 日志与临时产物 ----
+*.log
+logs/
+tmp/
+.cache/
+
+# ---- 数据：原始调研证据与运行期缓存不入库，仅保留 seed 快照 ----
+data/raw/
+data/cache/
+*.db
+*.db-journal
+*.sqlite3
+*.npz
+*.mtx
+!data/seed/**
+!data/seed/**/*
+
+# ---- Node / 前端 ----
+node_modules/
+dist/
+.vite/
+coverage/
+*.tsbuildinfo
+.pnpm-store/
+
+# 前端本地产物（**含真实 AK，绝不入库**）：
+#   .env.local / .env.*.local 由 Vite 在构建时注入到 dist/，属于可提交范围之外的本地配置
+#   .smoke/ 是 Playwright/无头浏览器冒烟测试的 profile 目录（数十 MB），
+#           其中 Default/Cache 与 Code Cache 会缓存已渲染页面，**里面带有 AK 明文**
+#   .tmp/   构建与测试的中间产物
+frontend/.smoke/
+frontend/.tmp/
+frontend/dist/
+*.local
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+.uv/

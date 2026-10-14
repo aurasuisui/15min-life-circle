@@ -1,0 +1,29 @@
+{
+  "name": "life-circle-15min-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "「15 分钟生活圈」智能体检与规划助手 · 前端（Vue 3 + Vite + TS）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "build:only": "vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "echarts": "^5.6.0",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "typescript": "~5.7.3",
+    "vite": "^6.3.5",
+    "vue-tsc": "^2.2.10"
+  },
+  "allowScripts": [
+    "esbuild"
+  ]
+}

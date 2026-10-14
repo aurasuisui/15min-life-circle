@@ -1,0 +1,60 @@
+# ==============================================================================
+# 「15 分钟生活圈」智能体检与规划助手 —— docker compose 一键启动
+#
+#   docker compose up --build        # 打开 http://127.0.0.1:8000
+#
+# 默认 DATA_MODE=replay：读取镜像内置的离线快照，【零 API 配额】跑通全流程。
+# 想接真实百度 API：在仓库根目录建 .env（见 .env.example），把 DATA_MODE 改成 live。
+#
+# ⚠️ 本项目开发机未安装 Docker，本文件【未经真实 docker compose up 验证】。
+#    等价且已实测的启动路径：./scripts/run.sh --offline / .\scripts\run.ps1 -Offline
+# ==============================================================================
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: 15min-life-circle:latest
+    container_name: life-circle
+    ports:
+      - "8000:8000"
+    environment:
+      # 离线优先：评审方零配额跑通。需要真实 API 时在 .env 里改成 live。
+      DATA_MODE: ${DATA_MODE:-replay}
+      BACKEND_HOST: "0.0.0.0"
+      BACKEND_PORT: "8000"
+      # 配额保护（个人开发者 3 QPS，取 2.5 留余量）
+      API_QPS_LIMIT: ${API_QPS_LIMIT:-2.5}
+      API_DAILY_POI_LIMIT: ${API_DAILY_POI_LIMIT:-100}
+      API_DAILY_ROUTE_LIMIT: ${API_DAILY_ROUTE_LIMIT:-5000}
+      CACHE_DB_PATH: "/app/data/cache/app.db"
+      SEED_DIR: "/app/data/seed"
+      FRONTEND_DIST: "/app/frontend/dist"
+      # 百度地图密钥：从根目录 .env 读取（.env 已被 .gitignore 忽略，绝不入库）
+      BAIDU_MAP_SERVER_AK: ${BAIDU_MAP_SERVER_AK:-}
+      BAIDU_MAP_SERVER_SK: ${BAIDU_MAP_SERVER_SK:-}
+      VITE_BAIDU_MAP_BROWSER_AK: ${VITE_BAIDU_MAP_BROWSER_AK:-}
+      # LLM 可选：留空即走模板化降级，功能不缺失
+      LLM_ENABLED: ${LLM_ENABLED:-false}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.deepseek.com}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-deepseek-chat}
+      LLM_EFFORT: ${LLM_EFFORT:-low}
+      LLM_TIMEOUT_S: ${LLM_TIMEOUT_S:-40}
+      LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-4000}
+    volumes:
+      # 离线快照只读挂载：评审方可以用自己的快照替换，而不用重建镜像
+      - ./data/seed:/app/data/seed:ro
+      # 缓存与配额账本持久化（容器重启不丢账、不丢缓存）
+      - life-circle-cache:/app/data/cache
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+volumes:
+  life-circle-cache:

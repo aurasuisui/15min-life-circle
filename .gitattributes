@@ -1,0 +1,39 @@
+# ==============================================================================
+# .gitattributes —— 换行符与文本规范化
+#
+# 为什么需要这个文件：shell 脚本若被检出成 CRLF，Linux/macOS 上会报
+#   `/usr/bin/env: 'bash\r': No such file or directory`
+# 这是跨平台仓库最常见的"在我机器上能跑"故障。这里显式钉死。
+# ==============================================================================
+
+# 默认：自动检测文本文件，提交时统一为 LF
+* text=auto eol=lf
+
+# Shell / Python / 前端源码：必须 LF
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.py        text eol=lf
+*.ts        text eol=lf
+*.js        text eol=lf
+*.vue       text eol=lf
+*.json      text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.md        text eol=lf
+Dockerfile  text eol=lf
+
+# PowerShell 脚本：Windows 上跑，但保留 LF 亦可（PowerShell 5.1 两者都能解析）。
+# 注意：run.ps1 含中文，必须带 UTF-8 BOM，否则 Windows PowerShell 5.1 会按 GBK 解析导致语法错误。
+*.ps1       text eol=lf working-tree-encoding=UTF-8
+
+# 二进制文件不参与文本转换
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.webp      binary
+*.pdf       binary
+*.xlsx      binary
+*.ico       binary
+*.woff      binary
+*.woff2     binary

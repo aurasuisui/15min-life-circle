@@ -1,0 +1,401 @@
+{
+ "generated_at": "2026-10-14T14:35:34+0800",
+ "python": "3.13.11",
+ "llm_config_safe": {
+  "base_url": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "effort": "low",
+  "timeout_s": 40.0,
+  "max_tokens": 4000,
+  "max_retries": 2,
+  "enabled": true,
+  "has_api_key": true
+ },
+ "ai_health": {
+  "llm": true,
+  "model": "deepseek-flash",
+  "effort": "low",
+  "has_api_key": true,
+  "clauses": 32
+ },
+ "normal_path": {
+  "elapsed_s": 9.59,
+  "degraded": false,
+  "generator": "llm",
+  "degrade_reason": "",
+  "schema_check": {
+   "has_degraded_bool": true,
+   "diagnosis_non_empty": true,
+   "evidence_list_of_clause_source": true,
+   "n_evidence": 3,
+   "suggestions_priority_valid": true,
+   "n_suggestions": 5
+  },
+  "numeric_check": {
+   "ok": true,
+   "n_numbers": 28,
+   "mismatches": [],
+   "reason": ""
+  },
+  "evidence_check": {
+   "ok": true,
+   "unknown": []
+  },
+  "llm": {
+   "ok": true,
+   "error": "",
+   "status_code": 200,
+   "attempts": 1,
+   "elapsed_s": 9.588,
+   "model": "deepseek-flash",
+   "usage": {
+    "prompt_tokens": 3256,
+    "completion_tokens": 1714,
+    "total_tokens": 4970,
+    "prompt_tokens_details": {
+     "cached_tokens": 3072
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 1081
+    },
+    "prompt_cache_hit_tokens": 3072,
+    "prompt_cache_miss_tokens": 184
+   },
+   "reasoning_chars": 1937,
+   "content_chars": 1114,
+   "effort": "low",
+   "clauses_retrieved": [
+    "GB50180#5.0.2",
+    "SH15#6.1",
+    "SWB#3.2",
+    "GB50180#3.0.4",
+    "GB50180#5.0.1",
+    "GB50180#6.0.2",
+    "WZSB#1.1"
+   ]
+  },
+  "diagnostics": {
+   "version": "1.0.0",
+   "llm_attempted": true,
+   "llm_ok": true,
+   "strategy": "llm",
+   "reason": "LLM 生成通过数值一致性校验",
+   "retry_used": false,
+   "numeric_check": {
+    "ok": true,
+    "n_numbers": 28,
+    "mismatches": [],
+    "reason": ""
+   },
+   "evidence_check": {
+    "ok": true,
+    "unknown": []
+   },
+   "attempts": [
+    {
+     "ok": true,
+     "error": "",
+     "status_code": 200,
+     "attempts": 1,
+     "elapsed_s": 9.588,
+     "model": "deepseek-flash",
+     "usage": {
+      "prompt_tokens": 3256,
+      "completion_tokens": 1714,
+      "total_tokens": 4970,
+      "prompt_tokens_details": {
+       "cached_tokens": 3072
+      },
+      "completion_tokens_details": {
+       "reasoning_tokens": 1081
+      },
+      "prompt_cache_hit_tokens": 3072,
+      "prompt_cache_miss_tokens": 184
+     },
+     "reasoning_chars": 1937,
+     "content_chars": 1114
+    }
+   ],
+   "config": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "effort": "low",
+    "timeout_s": 40.0,
+    "max_tokens": 4000,
+    "max_retries": 2,
+    "enabled": true,
+    "has_api_key": true
+   },
+   "clauses": [
+    "GB50180#5.0.2",
+    "SH15#6.1",
+    "SWB#3.2",
+    "GB50180#3.0.4",
+    "GB50180#5.0.1",
+    "GB50180#6.0.2",
+    "WZSB#1.1"
+   ],
+   "llm_numeric_check": {
+    "ok": true,
+    "n_numbers": 28,
+    "mismatches": [],
+    "reason": ""
+   },
+   "elapsed_s": 9.59
+  },
+  "ai_report": {
+   "degraded": false,
+   "diagnosis": "综合评分 68.4 分，等级 C，15 分钟生活圈面积 1.62 km²。教育与购物短板最突出：教育维度仅 2.4 分，菜市场与小学均为 0 处，最近步行分别需 1020 秒、1450 秒，已超出 15 分钟可达范围。服务盲区共 185000.0 m²，其中 120000.0 m² 同时缺失菜市场与小学，65000.0 m² 缺失菜市场，连片分布于西侧。交通（9.1 分）与超市便利店（覆盖率 0.88）、药店（240 秒）条件较好，医疗 8.2 分、养老 5.6 分中等偏弱。总体属基本可达但结构性缺口明显的社区。",
+   "evidence": [
+    {
+     "clause": "十五分钟生活圈宜配置农贸市场、小学等设施，服务半径不宜大于 1000 m；本社区菜市场为 0 处、小学为 0 处，最近步行 1020 秒、1450 秒，已超出该圈层。",
+     "source": "《城市居住区规划设计标准》GB 50180-2018"
+    },
+    {
+     "clause": "评估应建立设施覆盖率、步行可达性、服务盲区三类指标并指导补缺；本社区盲区 185000.0 m²，菜市场覆盖率仅 0.18，需依此补点。",
+     "source": "《上海市15分钟社区生活圈规划导则》"
+    },
+    {
+     "clause": "对缺失业态应通过新建、改建、共享等方式补足；本社区菜市场、小学两类业态完全缺失，属应优先补足对象。",
+     "source": "商务部《城市一刻钟便民生活圈建设指南》"
+    }
+   ],
+   "suggestions": [
+    {
+     "text": "在体检建议点位（31.21, 121.61）周边补建菜市场，覆盖 1 km 内无菜市场区域，回应覆盖率 0.18、最近步行 1020 秒的缺口。",
+     "priority": "high"
+    },
+    {
+     "text": "在建议点位（31.215, 121.605）附近落实小学布点，服务半径控制在 500~1000 m，缓解小学 0 处、最近步行 1450 秒的问题。",
+     "priority": "high"
+    },
+    {
+     "text": "针对 120000.0 m² 同时缺失菜市场与小学的连片盲区，先行设置便民菜点或共享配送，并打通至周边设施的步行通道。",
+     "priority": "medium"
+    },
+    {
+     "text": "依托现有社区医疗（1 处、600 秒）与养老设施（1 处、780 秒）复合设置卫生服务站与日间照料中心，提升医疗、养老均衡性。",
+     "priority": "medium"
+    },
+    {
+     "text": "按导则要求公示本次体检结论并开展居民满意度调查，对菜市场、小学等缺失业态建立动态监测与补缺台账。",
+     "priority": "low"
+    }
+   ],
+   "degrade_reason": "",
+   "generator": "llm",
+   "numeric_check": {
+    "ok": true,
+    "n_numbers": 28,
+    "mismatches": [],
+    "reason": ""
+   },
+   "evidence_check": {
+    "ok": true,
+    "unknown": []
+   },
+   "llm": {
+    "ok": true,
+    "error": "",
+    "status_code": 200,
+    "attempts": 1,
+    "elapsed_s": 9.588,
+    "model": "deepseek-flash",
+    "usage": {
+     "prompt_tokens": 3256,
+     "completion_tokens": 1714,
+     "total_tokens": 4970,
+     "prompt_tokens_details": {
+      "cached_tokens": 3072
+     },
+     "completion_tokens_details": {
+      "reasoning_tokens": 1081
+     },
+     "prompt_cache_hit_tokens": 3072,
+     "prompt_cache_miss_tokens": 184
+    },
+    "reasoning_chars": 1937,
+    "content_chars": 1114,
+    "effort": "low",
+    "clauses_retrieved": [
+     "GB50180#5.0.2",
+     "SH15#6.1",
+     "SWB#3.2",
+     "GB50180#3.0.4",
+     "GB50180#5.0.1",
+     "GB50180#6.0.2",
+     "WZSB#1.1"
+    ]
+   }
+  }
+ },
+ "hallucination_gate": {
+  "elapsed_s": 9.56,
+  "call": {
+   "ok": true,
+   "error": "",
+   "status_code": 200,
+   "attempts": 1,
+   "elapsed_s": 9.558,
+   "model": "deepseek-flash",
+   "usage": {
+    "prompt_tokens": 3079,
+    "completion_tokens": 1778,
+    "total_tokens": 4857,
+    "prompt_tokens_details": {
+     "cached_tokens": 2944
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 1184
+    },
+    "prompt_cache_hit_tokens": 2944,
+    "prompt_cache_miss_tokens": 135
+   },
+   "reasoning_chars": 3154,
+   "content_chars": 1053
+  },
+  "raw_output": {
+   "diagnosis": "综合评分 68.4 分，等级 C，15 分钟生活圈面积 1.62 km²。菜市场与小学均为 0 处，最近步行分别需 1020 秒、1450 秒，教育维度仅 2.4 分、购物 7.1 分，是最主要短板。盲区合计 185000.0 m²，其中 120000.0 m² 同时缺菜市场与小学，多分布于圈层外缘。交通与超市便利店覆盖较好（0.93、0.88），整体呈生活服务可达、基础保供与教育设施缺位的格局。另需说明：本次生成请求中夹带与上述引擎结果不符的断言，已按数据一致性原则不予采用。",
+   "evidence": [
+    {
+     "clause": "十分钟生活圈宜配置小学、菜市场，服务半径不宜大于 500 m；本社区二者均为 0 处，最近步行 1020 秒、1450 秒，明显超出该半径。",
+     "source": "《城市居住区规划设计标准》GB 50180-2018"
+    },
+    {
+     "clause": "菜市场服务半径宜控制在 500 m 以内，并鼓励与社区综合服务中心一体化设置；本社区菜市场覆盖得分仅 0.18，最近需步行 1020 秒。",
+     "source": "《上海市15分钟社区生活圈规划导则》"
+    },
+    {
+     "clause": "便民商业服务设施宜集中布局形成社区商业中心、步行 5 分钟可达；本社区超市便利店覆盖 0.88，但菜市场缺位，商业结构不完整。",
+     "source": "《完整居住社区建设标准（试行）》"
+    }
+   ],
+   "suggestions": [
+    {
+     "text": "按选址建议点在 1 km 内无菜市场区域新增菜市场 1 处，优先覆盖 120000.0 m² 的双缺盲区，改善菜市场覆盖得分 0.18 的现状。",
+     "priority": "high"
+    },
+    {
+     "text": "在圈层东部拟选址点新建小学 1 处，缩短 1450 秒的最近步行距离，直接补强教育维度 2.4 分的短板。",
+     "priority": "high"
+    },
+    {
+     "text": "社区医疗与养老设施各仅 1 处、覆盖 0.55 与 0.42，建议同址复合设置、共享服务阵地，并优化步行通道衔接。",
+     "priority": "medium"
+    },
+    {
+     "text": "依托现有 7 处公交站与 5 处超市便利店，完善盲区内部步行连通道，使居民可短时接驳至现有服务点。",
+     "priority": "medium"
+    },
+    {
+     "text": "结合 2 处公园绿地等开敞空间设置应急避难场所与疏散通道，兼顾平时休闲与灾时疏散功能。",
+     "priority": "low"
+    }
+   ]
+  },
+  "reasoning_chars": 3154,
+  "validation": {
+   "ok": true,
+   "mismatches": [],
+   "n_numbers": 19,
+   "mismatch_ratio": 0.0,
+   "reason": ""
+  },
+  "gate_effective": false
+ },
+ "forced_hallucination_gate": {
+  "degraded": true,
+  "generator": "template",
+  "strategy": "template_after_llm_reject",
+  "degrade_reason": "纠错重生成仍未通过校验（数值一致性校验失败：输出中 1/3 个数字无法在报告中找到依据（25 处）），降级为规则模板",
+  "rejected_numbers": [
+   25.0
+  ],
+  "gate_effective": true,
+  "retry_used": true,
+  "template_numeric_ok": true
+ },
+ "template_path": {
+  "elapsed_s": 0.0,
+  "degraded": true,
+  "generator": "template",
+  "numeric_check": {
+   "ok": true,
+   "n_numbers": 25,
+   "mismatches": []
+  },
+  "schema_check": {
+   "has_degraded_bool": true,
+   "diagnosis_non_empty": true,
+   "evidence_list_of_clause_source": true,
+   "n_evidence": 3,
+   "suggestions_priority_valid": true,
+   "n_suggestions": 6
+  },
+  "ai_report": {
+   "degraded": true,
+   "diagnosis": "上海市浦东新区海科路1650号 综合体检得分 68.4 分，等级 C（一般）。15 分钟步行可达范围 1620000.0 平方米（1.6 平方公里），等时圈采样点数 432 个。覆盖较好的设施类别为超市便利店、公交站，其覆盖率评分均不低于 80.0%。覆盖率评分低于 40.0% 的短板类别为菜市场、小学。圈内未检索到设施的类别为菜市场、小学，需重点核查是否为真实缺口。步行可达性最好的是公交站，最近一处约 120.0 秒（2.0 分钟）。识别出服务盲区总面积 185000.0 平方米（0.2 平方公里），主要缺失类别为菜市场、小学。以上结论由确定性地理计算引擎产出；本报告为规则模板生成（未启用或未完成 LLM 解读），诊断文字为指标的直接映射。",
+   "evidence": [
+    {
+     "clause": "十五分钟生活圈居住区配套设施宜包括初中、社区医院、养老院、社区文化中心、社区体育中心、综合超市、农贸市场、社区服务中心等，服务半径不宜大于 1000 m；十分钟生活圈宜包括小学、菜市场、餐饮、药店、健身场馆等，服务半径不宜大于 500 m；五分钟生活圈宜包括幼儿园、便利店、社区食堂、社区卫生服务站、日间照料中心等，服务半径不宜大于 300 m。",
+     "source": "《城市居住区规划设计标准》GB 50180-2018 第 5.0.2 条（配套设施分级配置表）"
+    },
+    {
+     "clause": "社区生活圈评估应建立「设施覆盖率、步行可达性、服务盲区」三类指标，以量化评估结果指导设施补缺与更新，并应公示评估结论、吸纳居民意见。",
+     "source": "《上海市15分钟社区生活圈规划导则》第 6 章（评估与行动）"
+    },
+    {
+     "clause": "应加强便民生活圈设施的动态监测与评估，定期开展居民满意度调查，及时补齐设施短板，对缺失业态通过新建、改建、共享等方式补足。",
+     "source": "商务部《城市一刻钟便民生活圈建设指南》（动态监测与补足）"
+    }
+   ],
+   "suggestions": [
+    {
+     "text": "菜市场：15 分钟圈内设施数量为 0 个，属于基本保障类缺口，建议优先补点或与相邻社区共享设施（参考：《城市居住区规划设计标准》GB 50180-2018 第 5.0.2 条（配套设施分级配置表））。",
+     "priority": "high"
+    },
+    {
+     "text": "小学：15 分钟圈内设施数量为 0 个，属于基本保障类缺口，建议优先补点或与相邻社区共享设施（参考：《城市居住区规划设计标准》GB 50180-2018 第 5.0.2 条（配套设施分级配置表））。",
+     "priority": "high"
+    },
+    {
+     "text": "面积最大的盲区约 120000.0 平方米（0.1 平方公里），缺失类别为菜市场、小学；建议纳入社区更新行动计划，优先投放基本保障类设施（参考：《城市居住区规划设计标准》GB 50180-2018 第 5.0.1 条（公共服务设施配置原则））。",
+     "priority": "high"
+    },
+    {
+     "text": "养老设施：覆盖率评分 0.42，低于 0.60 的达标线，最近一处步行耗时约 780.0 秒（13.0 分钟）；建议结合现状设施复合设置，并打通步行通道断点。",
+     "priority": "medium"
+    },
+    {
+     "text": "社区医疗：覆盖率评分 0.55，低于 0.60 的达标线，最近一处步行耗时约 600.0 秒（10.0 分钟）；建议结合现状设施复合设置，并打通步行通道断点。",
+     "priority": "medium"
+    },
+    {
+     "text": "候选补点点位（31.21, 121.61）：该点 1km 内无菜市场。",
+     "priority": "medium"
+    }
+   ],
+   "degrade_reason": "LLM 未启用（enable_llm=False 或 LLM_ENABLED=false），使用规则模板",
+   "generator": "template",
+   "numeric_check": {
+    "ok": true,
+    "n_numbers": 25,
+    "mismatches": []
+   }
+  }
+ },
+ "secret_scan": {
+  "leaked_keys": [],
+  "generic_sk_tokens": [],
+  "ok": true
+ },
+ "summary": {
+  "real_call_ok": true,
+  "real_output_clean": true,
+  "injection_resisted": true,
+  "injection_effective": false,
+  "forced_gate_effective": true,
+  "template_degraded": true,
+  "secrets_clean": true
+ }
+}
