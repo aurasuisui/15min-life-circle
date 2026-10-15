@@ -11,8 +11,16 @@
 #   * 默认 DATA_MODE=replay（离线快照），评审方【零 API 配额】即可跑通。
 #   * 目录结构严格对齐 docs/CONTRACT.md §0。
 #
-# ⚠️ 诚实声明：本项目开发机未安装 Docker，本文件【未经真实 docker build 验证】，
-#    仅做过语法与路径核对。等价且已实测的启动路径见 scripts/run.ps1 / scripts/run.sh。
+# ✅ 构建与运行验证（2026-10-15，Docker 29.8.2 / Docker Desktop，Windows + WSL2）
+#      docker compose build        -> 成功，镜像 535 MB
+#      docker compose up -d        -> 容器 10 秒内达到 healthy
+#      GET /api/health             -> 200
+#      GET /api/audit              -> 200，零 API 配额产出完整体检报告
+#    镜像内已确认导入：contourpy 1.4.0 / shapely 2.2.0 / scipy 1.18.1 / numpy 2.5.4
+#
+#    ⚠️ 已知坑：根目录若存在 .env 且其中 DATA_MODE=live/hybrid，
+#       docker compose 的 ${DATA_MODE:-replay} 会被它覆盖，从而消耗真实配额。
+#       评审方不提供 .env 时默认即 replay（零配额）。
 # ==============================================================================
 
 

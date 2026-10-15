@@ -6,8 +6,13 @@
 # 默认 DATA_MODE=replay：读取镜像内置的离线快照，【零 API 配额】跑通全流程。
 # 想接真实百度 API：在仓库根目录建 .env（见 .env.example），把 DATA_MODE 改成 live。
 #
-# ⚠️ 本项目开发机未安装 Docker，本文件【未经真实 docker compose up 验证】。
-#    等价且已实测的启动路径：./scripts/run.sh --offline / .\scripts\run.ps1 -Offline
+# ✅ 已于 2026-10-15 用 Docker 29.8.2 实测通过：build 成功、容器 10s healthy、
+#    /api/health 200、/api/audit 200（零 API 配额）。
+#
+# ⚠️ 重要：下面的 ${DATA_MODE:-replay} 会被【根目录 .env】里的同名变量覆盖。
+#    若你的 .env 写着 DATA_MODE=live 或 hybrid，容器就会真实调用百度接口并消耗配额。
+#    想要严格的零配额演示，请显式指定：docker compose run -e DATA_MODE=replay app
+#    或直接把 .env 里的 DATA_MODE 改成 replay。
 # ==============================================================================
 
 services:

@@ -1,8 +1,20 @@
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-pydantic==2.10.4
-pydantic-settings==2.7.0
+# ==============================================================================
+# 运行时依赖 —— 版本为开发机实测通过的组合（Python 3.13 / x86_64）
+#
+# ⚠️ 注意：contourpy / scipy / shapely 是【等时圈算法核心】的硬依赖，
+#    缺任何一个都会在运行时报 ModuleNotFoundError：
+#      contourpy -> marching squares 提取等值线（app/core/isochrone.py）
+#      scipy     -> cKDTree 做 IDW 最近邻检索（app/core/field.py）
+#      shapely   -> 等值线拓扑修复与几何运算（app/core/isochrone.py）
+#    历史教训：本文件曾漏掉这三个包，而 pyproject.toml 里有，
+#    导致 docker 镜像能构建成功但一启动就崩。改依赖时请两边同步。
+# ==============================================================================
+fastapi==0.143.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.1
+pydantic-settings==2.15.0
 httpx==0.28.1
-numpy==2.2.1
-pytest==8.3.4
-pytest-asyncio==0.25.0
+numpy==2.5.4
+scipy==1.18.1
+shapely==2.2.0
+contourpy==1.4.0

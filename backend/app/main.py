@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -24,6 +25,50 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 log = logging.getLogger("app")
+
+
+# ---------------------------------------------------------------------------
+# 日志脱敏（安全关键）
+#
+# 百度 Web 服务的协议要求 AK 只能放在查询串里，于是 httpx 的 INFO 日志会把
+#   ...&ak=qbzboHVX...&sn=...&timestamp=...
+# 明文打进控制台。演示录屏、截图、CI 日志、评审方日志都可能因此泄露密钥。
+#
+# 两层防护：
+#   ① 把 httpx / httpcore 降到 WARNING —— 从源头掐掉逐请求的 URL 打印；
+#   ② 在 root handler 上挂一个兜底过滤器，对任何仍带出密钥的日志消息打码。
+# ---------------------------------------------------------------------------
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+
+_SECRET_PATTERNS = (
+    (re.compile(r"([?&]ak=)[A-Za-z0-9]{16,}"), r"\1<REDACTED>"),
+    (re.compile(r"([?&]sn=)[A-Fa-f0-9]{16,}"), r"\1<REDACTED>"),
+    (re.compile(r"(sk-)[A-Za-z0-9]{16,}"), r"\1<REDACTED>"),
+    (re.compile(r"([Aa][Pp][Ii]_?[Kk][Ee][Yy][\"']?\s*[=:]\s*[\"']?)[A-Za-z0-9_\-]{8,}"), r"\1<REDACTED>"),
+)
+
+
+class _RedactSecrets(logging.Filter):
+    """兜底打码：任何日志消息里出现的 ak= / sn= / sk- / api_key 都被替换。"""
+
+    def filter(self, record: logging.LogRecord) -> bool:  # noqa: A003
+        try:
+            msg = record.getMessage()
+        except Exception:  # noqa: BLE001
+            return True
+        red = msg
+        for pat, rep in _SECRET_PATTERNS:
+            red = pat.sub(rep, red)
+        if red != msg:
+            record.msg = red
+            record.args = ()
+        return True
+
+
+_redactor = _RedactSecrets()
+for _h in logging.getLogger().handlers:
+    _h.addFilter(_redactor)
 
 DESCRIPTION = """\
 **「15 分钟生活圈」智能体检与规划助手 —— 后端 API**

@@ -188,6 +188,16 @@ class OnlineFirstRouteProvider:
             return out
         except QuotaExhaustedError as e:
             self._note(f"算路配额不足，改用本地解析模型：{e.message}")
+        except BaiduApiError as e:
+            # 修复（2026-10-15）：原先只捕获 QuotaExhaustedError，
+            # 导致任何其它 live 侧失败（参数错 / SN 校验 / 端点熔断 / 重试耗尽）
+            # 都会直接抛给上层，而不是走 SOLUTION §5.3 的降级链。
+            # 实测触发场景：用一个 1000 km 外的终点调 routematrix，
+            # 百度先做参数校验、返回 status=2「距离超限」，
+            # 该错误绕过了端点熔断逻辑，于是把整次审计打挂。
+            self._note(
+                f"在线算路失败（{type(e).__name__}: {str(e.message)[:80]}），改用本地解析模型"
+            )
         if not self.allow_analytic or self.analytic is None:
             raise QuotaExhaustedError("route", -1, "hybrid 模式下算路快照缺失且配额不可用")
 

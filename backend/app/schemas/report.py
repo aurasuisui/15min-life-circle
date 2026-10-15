@@ -34,7 +34,7 @@ class Meta(BaseModel):
     center: LatLng
     address: str = ""
     generated_at: str
-    data_mode: Literal["live", "replay", "mock"] = "mock"
+    data_mode: Literal["live", "replay", "hybrid", "mock"] = "mock"
     degraded: bool = False
     degrade_reasons: list[str] = Field(default_factory=list)
     quota: MetaQuota = Field(default_factory=MetaQuota)
