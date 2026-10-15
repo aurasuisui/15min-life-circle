@@ -243,7 +243,11 @@ try {
     expression: `(() => {
       const input = document.querySelector('.searchbox input')
       const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
-      setter.call(input, '上海市浦东新区张江镇香楠路')
+      // 不要硬编码具体地址：地址框的默认值由前端跟随「后端当前激活的社区」，
+    // 写死张江会在切到别的社区快照时 geocode 失败 → 整页回退 mock，
+    // 于是所有数据断言看着还在、其实断言的是 mock 数据。
+    const ADDRESS = process.env.SMOKE_ADDRESS || input.value || '上海市浦东新区海科路1650号'
+    setter.call(input, ADDRESS)
       input.dispatchEvent(new Event('input', { bubbles: true }))
       document.querySelector('.searchbox button').click()
     })()`

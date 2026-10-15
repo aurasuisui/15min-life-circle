@@ -35,6 +35,9 @@ services:
       API_DAILY_ROUTE_LIMIT: ${API_DAILY_ROUTE_LIMIT:-5000}
       CACHE_DB_PATH: "/app/data/cache/app.db"
       SEED_DIR: "/app/data/seed"
+      # 选择分析哪个已采集的社区。留空则用 data/seed/index.json 里的 default。
+      # 在根目录 .env 里写 SEED_COMMUNITY=zhangjiang-haike 或 guangzhou-conghua 即可切换。
+      SEED_COMMUNITY: ${SEED_COMMUNITY:-}
       FRONTEND_DIST: "/app/frontend/dist"
       # 百度地图密钥：从根目录 .env 读取（.env 已被 .gitignore 忽略，绝不入库）
       BAIDU_MAP_SERVER_AK: ${BAIDU_MAP_SERVER_AK:-}

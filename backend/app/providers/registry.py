@@ -82,7 +82,25 @@ def get_analytic_model() -> AnalyticModel:
 
 
 def get_center() -> tuple[float, float]:
-    return _STATE.get("center", DEFAULT_CENTER)
+    """当前工作中心。
+
+    优先级：显式 set_center > 已加载社区快照声明的中心 > 默认社区中心。
+
+    修复（2026-10-15）：原实现是 `_STATE.get("center", DEFAULT_CENTER)`，
+    **从不读取已加载快照的中心**。后果是切到别的社区（如广州）后，
+    所有依赖 get_center() 的逻辑（mock 采样中心、replay 覆盖范围校验、
+    "/api/audit 未指定坐标时的默认点"）仍然拿着默认社区（张江）的坐标 ——
+    表现为「报错说快照是广州，却报出张江的中心」。
+    """
+    if "center" in _STATE:
+        return _STATE["center"]
+    try:
+        c = get_bundle().index.get("center") or {}
+        if c.get("lat") is not None and c.get("lng") is not None:
+            return (float(c["lat"]), float(c["lng"]))
+    except Exception:  # 无快照（mock / live）时回落到默认社区中心
+        pass
+    return DEFAULT_CENTER
 
 
 def set_center(center: tuple[float, float]) -> None:

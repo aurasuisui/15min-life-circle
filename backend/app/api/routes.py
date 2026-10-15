@@ -55,12 +55,29 @@ async def health() -> HealthResponse:
     from ..providers import describe
 
     info = describe()
+
+    # 当前激活社区的显示名与默认中心 —— 前端首屏用它，切社区无需改前端。
+    seed_name = None
+    seed_center = None
+    try:
+        from ..providers import get_bundle
+
+        _b = get_bundle()
+        seed_name = str(_b.index.get("name") or _b.name or "") or None
+        _c = _b.index.get("center") or {}
+        if _c.get("lat") is not None and _c.get("lng") is not None:
+            seed_center = {"lat": float(_c["lat"]), "lng": float(_c["lng"])}
+    except Exception:  # noqa: BLE001  无快照（mock/live）时保持 None
+        pass
+
     return HealthResponse(
         status="ok",
         data_mode=info["data_mode"],
         llm=_llm_enabled(),
         seed_available=bool(info.get("seed_available")),
         seed_community=info.get("seed_community"),
+        seed_name=seed_name,
+        seed_center=seed_center,
         seed_collected_at=info.get("seed_collected_at"),
         has_ak=bool(info.get("has_ak")),
         has_sk=bool(info.get("has_sk")),

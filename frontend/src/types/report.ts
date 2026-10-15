@@ -211,12 +211,19 @@ export interface GeocodeResult {
 }
 
 export interface HealthResult {
+  /** 当前激活社区的 id */
+  seed_community?: string | null
+  /** 当前激活社区的显示名 */
+  seed_name?: string | null
+  /** 当前激活社区的默认中心（BD09）；首屏默认点用它 */
+  seed_center?: { lat: number; lng: number } | null
   status: string
   data_mode: string
   llm: boolean
 }
 
 export interface SeedCommunity extends LatLng {
+  id?: string
   name: string
   address?: string
 }

@@ -103,21 +103,38 @@ export const useAuditStore = defineStore('audit', () => {
   async function bootstrap() {
     loading.value = true
     errorMessage.value = ''
+    // 首屏默认点必须跟随「后端当前激活的社区」。
+    // 原先硬编码张江（DEFAULT_CENTER），一旦后端切到别的社区快照，
+    // 首屏就必然 SEED_MISSING —— replay 只覆盖已采集快照的社区，
+    // 请求范围外的坐标会被后端明确拒绝（不再静默替换）。
+    let start: { lat: number; lng: number } = { lat: DEFAULT_CENTER.lat, lng: DEFAULT_CENTER.lng }
+    let activeCommunity: string | null = null
     try {
       const h = await api.health()
       backendOnline.value = h.status === 'ok'
+      activeCommunity = h.seed_community ?? null
+      if (h.seed_center && typeof h.seed_center.lat === 'number' && typeof h.seed_center.lng === 'number') {
+        start = { lat: h.seed_center.lat, lng: h.seed_center.lng }
+      }
     } catch {
       backendOnline.value = false
     }
     try {
       if (backendOnline.value) {
         const list = await api.seedCommunities().catch(() => null)
-        if (Array.isArray(list) && list.length) communities.value = list
+        if (Array.isArray(list) && list.length) {
+          communities.value = list
+          // 地址框默认值跟随「后端当前激活的社区」。
+          // 原先硬编码张江，切到别的社区后一点「分析」就会 geocode 失败
+          // （replay 只覆盖已采集快照的社区）→ 整个报告回退到前端内置 mock。
+          const active = list.find((c) => c.id === activeCommunity) ?? list[0]
+          if (active?.address) addressInput.value = active.address
+        }
       }
     } catch {
       /* 忽略：快捷社区不是关键路径 */
     }
-    await runAudit({ lat: DEFAULT_CENTER.lat, lng: DEFAULT_CENTER.lng })
+    await runAudit(start)
     loading.value = false
   }
 

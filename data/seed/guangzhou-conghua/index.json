@@ -1,0 +1,69 @@
+{
+ "id": "guangzhou-conghua",
+ "community": "guangzhou-conghua",
+ "name": "广州从化 · 广州软件学院",
+ "address": "广东省广州市从化区广从南路548号",
+ "center": {
+  "lat": 23.45832,
+  "lng": 113.502141
+ },
+ "collected_at": "2026-10-15T22:01:41+08:00",
+ "provider": "live",
+ "sample_config": {
+  "rays": 36,
+  "dr": 200.0,
+  "densify_per_crossing": 3,
+  "grid_res": 25.0
+ },
+ "barriers": [
+  {
+   "name": "创新河",
+   "y_m": -250.0,
+   "half_width_m": 45.0,
+   "bridge_x_m": -700.0
+  }
+ ],
+ "stats": {
+  "route_requests": 11,
+  "routes_charged": 439,
+  "poi_requests": 2,
+  "route_snapshots": 11,
+  "elapsed_s": 48.71
+ },
+ "expected": {
+  "isochrone_area_km2": {
+   "5": 0.195,
+   "10": 0.4222,
+   "15": 0.7582
+  },
+  "cleaning_funnel": {
+   "raw": 20,
+   "deduped": 20,
+   "corrected": 20,
+   "inside": 9
+  },
+  "blindspot_count": 2,
+  "blindspot_area_km2": 0.7969,
+  "score_total": 23.66,
+  "score_grade": "D"
+ },
+ "files": {
+  "poi.json": {
+   "bytes": 34167,
+   "sha256_16": "f24b6a19e028df50"
+  },
+  "geocode.json": {
+   "bytes": 120,
+   "sha256_16": "cd67193144b4b0ae"
+  },
+  "routes/matrix.json": {
+   "bytes": 20740,
+   "sha256_16": "591ee49f40cb47ca"
+  }
+ },
+ "notes": [
+  "等时圈一次采样服务 5/10/15 分钟三档（省 2.3 倍配额）",
+  "POI 用 2 组多关键字并集检索覆盖 8 类（按请求计费，D1 闸门 G1 实测确认）",
+  "快照覆盖等时圈采样 + 覆盖统计算路 + 盲区边界带校正，replay 可完全复现"
+ ]
+}

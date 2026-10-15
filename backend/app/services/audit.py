@@ -100,10 +100,27 @@ def _fresh_client():
 
 
 def _sample_config(mode: str, densify: int = 3) -> SampleConfig:
-    """live 模式必须省配额：routematrix 不可用时 directionlite 是 1 请求 1 条，
-    加密点越多越贵，所以压制到 1 个/穿越区间；mock/replay 零配额，可以多加密。"""
-    d = densify if mode in ("mock", "replay") else 1
-    return SampleConfig(rays=CFG_FIELDS["rays"], dr=CFG_FIELDS["dr"], densify_per_crossing=d)
+    """采样配置**必须与数据模式无关**。
+
+    修复（2026-10-15）：原实现在 live 模式下把 densify_per_crossing 压到 1
+    （理由是 routematrix 不可用时 directionlite 按条计费，加密点越贵），
+    而 replay 模式用 3。后果是致命的：
+
+      「用 --provider live 采集的快照」记录的加密点，
+       与「replay 回放时重新算出的加密点」不是同一批 ——
+       因为 densify 的数量不同，采样点坐标就不同，快照键（origin+destinations 的 sha1）全对不上。
+
+    实测（广州软件学院社区）：
+      * 粗采样 6 批 50/50/50/50/50/38 —— 6/6 全部命中；
+      * 加密点全缺，回放直接 SeedMissingError: routes/matrix.json 中没有 <hash>。
+    即「用 live 采集出来的快照根本没法零配额回放」，而回放正是本项目的硬性要求（NFR-3）。
+
+    一致性 >> 省那约 72 条路线（个人开发者算路配额 5000/日，完全够）。
+    mode 参数保留仅为签名兼容，不再影响结果。
+    """
+    return SampleConfig(
+        rays=CFG_FIELDS["rays"], dr=CFG_FIELDS["dr"], densify_per_crossing=densify
+    )
 
 
 @dataclass
@@ -215,11 +232,61 @@ def _snapshot_address() -> str:
         return ""
 
 
+def _snapshot_name() -> str:
+    """快照里的社区显示名（如「上海浦东 · 张江海科路社区」），用于错误提示。"""
+    try:
+        from ..providers import get_bundle
+
+        b = get_bundle()
+        return str(b.index.get("name") or b.name or "")
+    except Exception:
+        return ""
+
+
+# 快照社区覆盖半径（米）。
+# replay 模式下，若请求的中心明显超出这个范围，快照数据就不再代表该地点，
+# 必须显式报错 —— 绝不能用别的社区的数据冒充本次请求的中心。
+_SEED_COVER_RADIUS_M = 3000.0
+
+
+def _seed_center_hint(center: tuple[float, float], distance_m: float) -> str:
+    from ..core.geo import haversine_m  # noqa: F401  (保持导入一致性)
+
+    base = get_center()
+    name = _snapshot_name() or "样例社区"
+    return (
+        f"离线快照（replay）仅覆盖「{name}」：中心 {base[0]:.6f}, {base[1]:.6f}，"
+        f"覆盖半径约 {_SEED_COVER_RADIUS_M / 1000:.0f} km。"
+        f"本次请求的中心 {center[0]:.6f}, {center[1]:.6f} 距其 {distance_m / 1000:.1f} km，"
+        "用该快照作答会张冠李戴，因此拒绝。\n"
+        "两种解决办法：\n"
+        "  ① 切在线模式分析任意地点：把 .env 的 DATA_MODE 改成 live（会消耗真实配额）；\n"
+        "  ② 先为该地点采集快照，之后即可零配额复现：\n"
+        f"     python backend/scripts/collect_seed.py --provider live "
+        f"--community <社区id> --name <社区名> --address <地址> "
+        f"--lat {center[0]:.6f} --lng {center[1]:.6f}"
+    )
+
+
+def _ensure_center_within_seed(center: tuple[float, float], mode: str) -> None:
+    """replay 模式下校验请求中心是否落在快照社区覆盖范围内；超出则报错（绝不静默替换）。"""
+    if mode != "replay":
+        return
+    from ..core.geo import haversine_m
+
+    d = haversine_m(center, get_center())
+    if d > _SEED_COVER_RADIUS_M:
+        raise SeedMissingError(_seed_center_hint(center, d))
+
+
 def _resolve_center(opts: AuditOptions, mode: str) -> tuple[tuple[float, float], str, list[str]]:
     """返回 (中心 BD09, 地址, 备注)。"""
     notes: list[str] = []
     if opts.lat is not None and opts.lng is not None:
         center = (float(opts.lat), float(opts.lng))
+        # 修复（2026-10-15）：原先不校验就直接用快照数据算，于是
+        #   /api/audit?lat=<广州>&lng=<广州> 会返回 meta.address="广州…" 却配着张江的坐标与结论。
+        _ensure_center_within_seed(center, mode)
         addr = opts.address or ""
         if not addr:
             snap = _snapshot_address()
@@ -236,9 +303,23 @@ def _resolve_center(opts: AuditOptions, mode: str) -> tuple[tuple[float, float],
             try:
                 hit = gp.geocode(opts.address)
                 if hit:
-                    return (float(hit[0]), float(hit[1])), opts.address, notes
-            except SeedMissingError as e:
-                notes.append(f"地址快照未命中（{e}），已回退到样例社区中心点")
+                    center = (float(hit[0]), float(hit[1]))
+                    _ensure_center_within_seed(center, mode)
+                    return center, opts.address, notes
+            except SeedMissingError:
+                # 修复（2026-10-15）：原先这里会静默回退到样例社区中心，
+                # 却把用户输入的地址原样写进 meta.address —— 报告自相矛盾。
+                # 现在改为显式报错，并给出可操作的解决路径。
+                if mode == "replay":
+                    base = get_center()
+                    raise SeedMissingError(
+                        f"离线快照中没有地址「{opts.address}」的地理编码记录，"
+                        f"无法确定其坐标。快照只覆盖「{_snapshot_name() or '样例社区'}」"
+                        f"（中心 {base[0]:.6f}, {base[1]:.6f}）。\n"
+                        "请改用在线模式（.env 里 DATA_MODE=live），"
+                        "或先为该地点采集快照：python backend/scripts/collect_seed.py --help"
+                    ) from None
+                notes.append("地址快照未命中")
             except QuotaExhaustedError as e:
                 notes.append(f"地理编码配额不足，已回退到样例社区中心点：{e.message}")
             except Exception as e:  # noqa: BLE001
