@@ -89,11 +89,13 @@ const gradeText: Record<string, string> = { A: '优秀', B: '良好', C: '达标
           <span class="bar">
             <i
               :style="{
-                width: (d.score / 10) * 100 + '%',
+                // 维度分是百分制（见后端 app/services/score.py），直接当百分比宽度用。
+                // 历史 bug：曾写成 (d.score / 10) * 100，得分 52.38 会算出 523% 宽度，进度条溢出。
+                width: Math.max(0, Math.min(100, d.score)) + '%',
                 background:
-                  d.score >= 8
+                  d.score >= 80
                     ? 'linear-gradient(90deg,#31d0a5,#4ee0ff)'
-                    : d.score >= 6
+                    : d.score >= 60
                       ? 'linear-gradient(90deg,#ffb84d,#ffd98a)'
                       : 'linear-gradient(90deg,#ff5d73,#ff9aa8)'
               }"

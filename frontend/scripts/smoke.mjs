@@ -133,11 +133,27 @@ try {
   const _t0 = Date.now()
   let _waited = 0
   while (Date.now() - _t0 < REPORT_TIMEOUT_MS) {
+    // 就绪条件不能只看"画布数量够 4 个"：POI 自绘层与圈外压暗掩膜
+    // 是在地图 overlay 之后就绪的，社区稀疏时（如广州只有 9 个 POI）
+    // 会晚于 ECharts 画布，导致 POI/掩膜两项被误判为失败。
     const r = await send('Runtime.evaluate', {
-      expression: "document.querySelectorAll('canvas').length",
       returnByValue: true,
+      expression: `(() => {
+        const charts = document.querySelectorAll('canvas').length
+        const poi = document.querySelector('canvas.poi-canvas')
+        let painted = false
+        if (poi) {
+          const g = poi.getContext('2d')
+          const d = g.getImageData(0, 0, poi.width, poi.height).data
+          for (let i = 3; i < d.length; i += 400) if (d[i] > 0) { painted = true; break }
+        }
+        return JSON.stringify({ charts, painted })
+      })()`,
     })
-    if ((r?.result?.value ?? 0) >= 4) break
+    try {
+      const v = JSON.parse(r?.result?.value ?? '{}')
+      if ((v.charts ?? 0) >= 4 && v.painted === true) break
+    } catch { /* 继续等 */ }
     await sleep(500)
     _waited = Date.now() - _t0
   }
