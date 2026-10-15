@@ -187,8 +187,27 @@ def contour_to_polygon(
     from shapely.geometry import Polygon
     from shapely.ops import unary_union
 
+    # 采样噪声平滑（2026-10-15 新增）
+    # directionlite 对每个采样点【单独】做路网吸附，相邻点可能吸附到完全不同的路网：
+    # 实测广州软件学院同一个 600 m 环上，相邻方位耗时 762s / 1441s，
+    # 北向 200 m 要 1069s（0.19 m/s）而东向只要 174s（1.15 m/s）。
+    # IDW 会把这种逐点跳变放大成锯齿状的耗时场，等值线随之坑洼、甚至切出假空洞。
+    # 这里在提等值线之前做一次轻度高斯平滑（sigma≈1 格 = 25 m），
+    # 只抹掉单格噪声、不动真实的区域差异。
+    z_in = z
+    if z.ndim == 2 and min(z.shape) > 5:
+        try:
+            from scipy.ndimage import gaussian_filter
+
+            z_in = gaussian_filter(z, sigma=1.0, mode="nearest")
+            if mask is not None:
+                # 屏障内部按原值还原，避免把高值抹进不可通行区
+                z_in = np.where(mask, z, z_in)
+        except Exception:  # noqa: BLE001  平滑失败不影响主流程
+            z_in = z
+
     # contourpy 1.4 通过 z 的 masked array 表达不可通行区，没有 mask= 关键字参数
-    z_in = np.ma.masked_array(z, mask=mask) if mask is not None else z
+    z_in = np.ma.masked_array(z_in, mask=mask) if mask is not None else z_in
     cg = contourpy.contour_generator(
         x=xs, y=ys, z=z_in, fill_type="ChunkCombinedOffsetOffset"
     )
@@ -204,15 +223,26 @@ def contour_to_polygon(
     if pts_all is None or offs is None or offs2 is None or len(offs2) < 2:
         return None
 
-    rings = []
+    # contourpy 的 ChunkCombinedOffsetOffset 语义：
+    #   offs2[k]..offs2[k+1] 是第 k 个【填充轮廓】在 offs 中的环下标区间；
+    #   每个填充轮廓可能由多个环组成 —— 第 1 个是外环(shell)，其余是【洞(hole)】。
+    # 原实现把每个环都当成独立实心多边形再 union，等于把洞全部填实，
+    # 封闭小区 / 水域这类「内部不可达区」就丢失了（而这些恰是有价值的体检结论）。
+    polys = []
     for i in range(len(offs2) - 1):
-        seg = pts_all[offs[offs2[i]] : offs[offs2[i + 1]]]
-        if len(seg) >= 3:
-            rings.append(Polygon(seg))
-    if not rings:
+        lo, hi = int(offs2[i]), int(offs2[i + 1])
+        segs = [pts_all[offs[j] : offs[j + 1]] for j in range(lo, hi)]
+        segs = [s for s in segs if len(s) >= 3]
+        if not segs:
+            continue
+        try:
+            polys.append(Polygon(segs[0], segs[1:]))
+        except Exception:  # noqa: BLE001  环退化时只保留外环
+            polys.append(Polygon(segs[0]))
+    if not polys:
         return None
 
-    valid = [make_valid(r) for r in rings]
+    valid = [make_valid(r) for r in polys]
     geom = unary_union(valid)
     if geom.is_empty:
         return None

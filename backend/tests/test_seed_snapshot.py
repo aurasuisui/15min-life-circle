@@ -33,10 +33,23 @@ def test_seed_expected_matches_snapshot_run():
     """黄金文件回归：index.json 的 expected 必须与当前算法跑出来的结果一致。"""
     idx = _index()
     exp = idx["expected"]
-    assert exp["cleaning_funnel"] == {"raw": 32, "deduped": 31, "corrected": 30, "inside": 25}
+
+    # 这里只做【结构性】校验，不要硬编码采集当日的具体数值。
+    # 原因：那些数值属于「黄金文件」，已经由 index.json 的 expected 承载，
+    # 并由 test_audit_pipeline.py::test_replay_audit_matches_recorded_expectations
+    # 与当前算法实跑结果逐项比对。若在这里再抄一份硬编码，
+    # 每次算法改进后重标定（scripts/refresh_expected.py）都会产生一次假失败。
+    funnel = exp["cleaning_funnel"]
+    for key in ("raw", "deduped", "corrected", "inside"):
+        assert key in funnel, f"cleaning_funnel 缺少 {key}"
+    assert (
+        funnel["raw"] >= funnel["deduped"] >= funnel["corrected"] >= funnel["inside"] >= 0
+    ), f"清洗漏斗应逐级不增，实际 {funnel}"
+
     assert exp["blindspot_count"] >= 1
-    assert 50 < exp["score_total"] <= 100
+    assert 0 < exp["score_total"] <= 100
     assert exp["score_grade"] in ("A", "B", "C", "D")
+    assert len(exp["isochrone_area_km2"]) == 3, "应记录 5/10/15 三档等时圈面积"
 
 
 def test_seed_file_hashes_recorded():

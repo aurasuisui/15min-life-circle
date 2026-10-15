@@ -32,20 +32,22 @@
  },
  "expected": {
   "isochrone_area_km2": {
-   "5": 0.2659,
-   "10": 0.8343,
-   "15": 1.8561
+   "5": 0.2541,
+   "10": 0.8167,
+   "15": 1.8414
   },
   "cleaning_funnel": {
    "raw": 32,
    "deduped": 31,
    "corrected": 30,
-   "inside": 25
+   "inside": 24
   },
   "blindspot_count": 1,
-  "blindspot_area_km2": 0.0469,
-  "score_total": 59.75,
-  "score_grade": "C"
+  "blindspot_area_km2": 0.3281,
+  "score_total": 62.78,
+  "score_grade": "C",
+  "rebased_at": "2026-10-15T22:41:41+08:00",
+  "rebased_note": "算法变更后重标定（见 scripts/refresh_expected.py 说明）"
  },
  "files": {
   "poi.json": {
