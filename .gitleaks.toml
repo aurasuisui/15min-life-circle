@@ -25,6 +25,12 @@ paths = [
 ]
 # 文档中的占位符与脱敏写法
 regexes = [
+  # 测试夹具里的 sk- 占位符：语义上明确是假值。
+  # 其中 sk-leak-canary-* 还是刻意保留的 —— test_generate.py 用它断言
+  # 「真实 API Key 绝不会被写进生成的报告」。
+  # 只放行这几个【具名前缀】，不放行整个 tests/ 目录：
+  # 否则真把密钥粘进测试文件也会被静默放过，扫描器就瞎了。
+  '''sk-(test|super-secret|secret|leak-canary)[A-Za-z0-9_-]*''',
   '''ak=\*+''',
   '''<你的浏览器端AK>''',
   '''<你的服务端AK>''',
