@@ -13,6 +13,21 @@
 
 ---
 
+## 📺 演示视频与交付物
+
+| 内容 | 链接 |
+| --- | --- |
+| **演示视频**（2 分 53 秒 · 1920×1200 · 20 MB） | **[▶ 下载观看](https://github.com/aurasuisui/15min-life-circle/releases/download/v1.0/demo-15min-life-circle.mp4)** |
+| 作品介绍（含实测数据） | [docs/report/作品介绍.md](docs/report/作品介绍.md) |
+| 真实对比测试报告 | [docs/report/真实对比测试报告.md](docs/report/真实对比测试报告.md) |
+| 现场实测原始数据（轨迹 GPX） | [docs/report/field-data/](docs/report/field-data/) |
+| 技术设计文档（5 篇） | [docs/design/](docs/design/) |
+
+> 视频内容：赛题与团队 → 等时圈算法管线 → 设施覆盖与数据清洗 → 盲区识别 →
+> **现场实测验证（高驰手表 2417 个轨迹点，零越界）** → AI 层与工程治理。
+
+---
+
 ## 目录
 
 - [1. 效果预览](#1-效果预览)
