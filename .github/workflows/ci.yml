@@ -72,11 +72,20 @@ jobs:
           echo "OK: 未检出高置信度硬编码密钥"
 
       - name: gitleaks 全历史扫描（配置见 .gitleaks.toml）
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          config-path: .gitleaks.toml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # 不用 gitleaks/gitleaks-action@v2：它在【首次推送】时会按 push 事件算出
+          #   6bb0732a^..e7030e8
+          # 这样的扫描区间，而首个提交是根提交、没有父节点，
+          # 于是 git 直接报 "ambiguous argument ... unknown revision" 使 CI 失败
+          # （实测 2026-10-16 首次推送即复现）。
+          # 改为直接下载并扫描全部历史：行为确定，不依赖区间推断。
+          VER=8.24.3
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+          gitleaks detect --source . --redact -v --exit-code=2 --config .gitleaks.toml
 
   # ---------------------------------------------------------------------------
   # 2. 后端：测试 + 基准
