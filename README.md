@@ -17,7 +17,7 @@
 
 | 内容 | 链接 |
 | --- | --- |
-| **演示视频**（2 分 53 秒 · 1920×1200 · 20 MB） | **[▶ 下载观看](https://github.com/aurasuisui/15min-life-circle/releases/download/v1.0/demo-15min-life-circle.mp4)** |
+| **演示视频**（2 分 53 秒） | **[▶ B站在线观看](https://www.bilibili.com/video/BV1sGJt6qEUQ/)** · [下载 20 MB](https://github.com/aurasuisui/15min-life-circle/releases/download/v1.0/demo-15min-life-circle.mp4) |
 | 作品介绍（含实测数据） | [docs/report/作品介绍.md](docs/report/作品介绍.md) |
 | 真实对比测试报告 | [docs/report/真实对比测试报告.md](docs/report/真实对比测试报告.md) |
 | 现场实测原始数据（轨迹 GPX） | [docs/report/field-data/](docs/report/field-data/) |
