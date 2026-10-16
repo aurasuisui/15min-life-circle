@@ -52,11 +52,11 @@
  "files": {
   "poi.json": {
    "bytes": 34167,
-   "sha256_16": "f24b6a19e028df50"
+   "sha256_16": "4936889faffe833d"
   },
   "geocode.json": {
    "bytes": 120,
-   "sha256_16": "cd67193144b4b0ae"
+   "sha256_16": "637c322d031490ad"
   },
   "routes/matrix.json": {
    "bytes": 20740,

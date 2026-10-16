@@ -90,8 +90,16 @@ def _build_providers(provider: str, center):
 
 
 def _sha256(path: Path) -> str:
+    """快照文件哈希（**换行符无关**）。
+
+    为什么必须归一化：Windows 上 write_text 会把 \n 翻成 \r\n，而 CI（Linux）
+    检出后是 \n —— 直接对 read_bytes() 取哈希，同一份内容在两端算出的值不同，
+    test_seed_snapshot.py::test_seed_file_hashes_recorded 会在 CI 上假失败
+    （实测 2026-10-16：本地 132 全绿，CI 报 poi.json 哈希不符）。
+    统一按 LF 归一化后再哈希，两端一致。
+    """
     h = hashlib.sha256()
-    h.update(path.read_bytes())
+    h.update(path.read_bytes().replace(b"\r\n", b"\n"))
     return h.hexdigest()[:16]
 
 

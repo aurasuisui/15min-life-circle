@@ -57,7 +57,9 @@ def test_seed_file_hashes_recorded():
     assert idx["files"], "应记录快照文件哈希（防篡改 / 可审计）"
     for name, meta in idx["files"].items():
         p = SEED_DIR / "zhangjiang-haike" / name
-        h = hashlib.sha256(p.read_bytes()).hexdigest()[:16]
+        # 与 collect_seed._sha256 保持一致：按 LF 归一化后再哈希，
+        # 否则 Windows(CRLF) 与 CI(Linux, LF) 会算出不同值。
+        h = hashlib.sha256(p.read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:16]
         assert h == meta["sha256_16"], f"{name} 哈希与 index.json 不符"
 
 
