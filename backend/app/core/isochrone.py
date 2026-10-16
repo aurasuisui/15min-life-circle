@@ -184,7 +184,7 @@ def contour_to_polygon(
     """
     import contourpy
     from shapely import make_valid
-    from shapely.geometry import Polygon
+    from shapely.geometry import MultiPolygon, Polygon
     from shapely.ops import unary_union
 
     # 采样噪声平滑（2026-10-15 新增）
@@ -246,11 +246,41 @@ def contour_to_polygon(
     geom = unary_union(valid)
     if geom.is_empty:
         return None
+
+    # ---- 碎块过滤（2026-10-16 新增）----
+    # 栅格级（1~2 格）的洞与孤岛不是真实结论，而是采样噪声 / 单格抖动：
+    # 实测广州 15 分钟圈里残留了一个 5 顶点、1020 m² 的洞（≈1.6 个栅格），
+    # 渲染出来就是「大圈里套了个小圈」，看着像 bug。
+    # 而真实的「不可达孤岛」（封闭小区、水域）至少数千 m²，不会被误删。
+    cell = float(xs[1] - xs[0])
+    min_area = 4.0 * cell * cell  # ≈ 4 个栅格；1~2 格的抖动一律视为噪声
+
+    def _prune(g):
+        if g.is_empty:
+            return g
+        if g.geom_type == "Polygon":
+            holes = [r for r in g.interiors if Polygon(r).area >= min_area]
+            if len(holes) != len(g.interiors):
+                g = Polygon(g.exterior, holes)
+            return g if g.area >= min_area else Polygon()
+        if g.geom_type == "MultiPolygon":
+            parts = [p for p in (_prune(p) for p in g.geoms) if not p.is_empty]
+            if not parts:
+                return Polygon()
+            return parts[0] if len(parts) == 1 else MultiPolygon(parts)
+        return g
+
+    geom = _prune(geom)
+    if geom.is_empty:
+        return None
+
     try:
-        geom = geom.simplify(0.7 * (xs[1] - xs[0]), preserve_topology=True)
+        geom = geom.simplify(0.7 * cell, preserve_topology=True)
     except Exception:
         pass
-    return geom
+    # 简化后可能又冒出退化小环，再清一次
+    geom = _prune(geom)
+    return None if geom.is_empty else geom
 
 
 def build_isochrone(
