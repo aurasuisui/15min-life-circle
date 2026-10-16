@@ -1,5 +1,10 @@
 # 开发/测试依赖（在 requirements.txt 基础上追加）
+#
+# ⚠️ 不要把 pytest-asyncio 加回来：本仓库没有任何 async 测试
+#    （实测 grep "pytest.mark.asyncio|async def test_" 命中 0 个文件），
+#    而 pytest-asyncio 0.25 与 pytest 9 版本约束冲突，
+#    会让 CI 的 pip 解析直接 ResolutionImpossible（2026-10-16 实测）。
+#    真需要异步测试时，请一并确认与当时 pytest 版本的兼容性。
 -r requirements.txt
-pytest==9.1.1
-pytest-asyncio==0.25.0
-respx==0.23.1
+pytest>=8.3,<10
+respx>=0.22
